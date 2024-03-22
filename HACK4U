@@ -1,0 +1,257 @@
+load data
+head(Acceleration)
+timeDiffs = diff(Acceleration.Timestamp); % Calculate the difference between consecutive timestamps
+
+% Convert time differences to seconds. This step might vary depending on your timestamp format.
+timeDiffsInSeconds = seconds(timeDiffs);
+
+% Calculate the average sampling interval in seconds
+averageSamplingInterval = mean(timeDiffsInSeconds);
+
+% Calculate the sampling frequency in Hz
+fs = 1 / averageSamplingInterval;
+Y = fft(Acceleration.Z); % Assuming Z is your signal
+L = length(Acceleration.Z); % Signal length
+P2 = abs(Y/L); % Two-sided spectrum
+P1 = P2(1:L/2+1); % Single-sided spectrum
+P1(2:end-1) = 2*P1(2:end-1);
+f = fs*(0:(L/2))/L; % Frequency axis
+plot(f,P1); % Plot frequency spectrum
+title('Single-Sided Amplitude Spectrum of Z(t)');
+xlabel('f (Hz)');
+ylabel('|P1(f)|');
+hold on
+A = fft(Acceleration.X); % Assuming X is your signal
+B = length(Acceleration.X); % Signal length
+P2 = abs(A/B); % Two-sided spectrum
+P1 = P2(1:B/2+1); % Single-sided spectrum
+P1(2:end-1) = 2*P1(2:end-1);
+f = fs*(0:(L/2))/L; % Frequency axis
+plot(f,P1); % Plot frequency spectrum
+title('Single-Sided Amplitude Spectrum of Z(t)');
+xlabel('f (Hz)');
+ylabel('|P1(f)|');
+C = fft(Acceleration.Y); % Assuming X is your signal
+D = length(Acceleration.Y); % Signal length
+P2 = abs(C/D); % Two-sided spectrum
+P1 = P2(1:D/2+1); % Single-sided spectrum
+P1(2:end-1) = 2*P1(2:end-1);
+f = fs*(0:(L/2))/L; % Frequency axis
+plot(f,P1); % Plot frequency spectrum
+title('Single-Sided Amplitude Spectrum of Z(t)');
+xlabel('f (Hz)');
+ylabel('|P1(f)|');
+hold off
+%% 
+cutoffFrequency = 10; % Example cutoff frequency in Hz
+accelDataFiltered.X = lowpass(Acceleration.X, cutoffFrequency, fs);
+accelDataFiltered.Y = lowpass(Acceleration.Y, cutoffFrequency, fs);
+accelDataFiltered.Z = lowpass(Acceleration.Z, cutoffFrequency, fs);
+totalAccel = sqrt(accelDataFiltered.X.^2 + accelDataFiltered.Y.^2 + accelDataFiltered.Z.^2);
+%% 
+% Number of samples in your dataset
+numSamples = 22276;
+
+% Time step size in seconds
+timeStep = 0.019;
+
+% Create a time vector starting from 0, stepping by the timeStep, and ending just before numSamples*timeStep
+timeVector = (0:timeStep:(numSamples-1)*timeStep)';
+%% 
+FinalAccel = totalAccel- mean(totalAccel)
+minPeakHeight = std(FinalAccel);
+
+[pks,locs] = findpeaks(FinalAccel,'MINPEAKHEIGHT',minPeakHeight);
+numSteps = numel(pks)
+hold on;
+plot(timeVector(locs), pks, 'r', 'Marker', 'v', 'LineStyle', 'none');
+title('Counting Steps');
+xlabel('Time (s)');
+ylabel('Acceleration Magnitude, No Gravity (m/s^2)');
+hold off;
+% Initialize a column of zeros with the same length as your acceleration data
+stepIndicator = zeros(length(FinalAccel), 1);
+
+% Set the indices at the locations of the peaks to 1
+stepIndicator(locs) = 1;
+
+% The sum of this st
+% epIndicator vector will give you the total number of steps
+numSteps = sum(stepIndicator);
+
+% Calculate velocity by integratings acceleration
+velocity_x = cumtrapz(timeVector, Acceleration.X);
+velocity_y = cumtrapz(timeVector, Acceleration.Y);
+velocity_z = cumtrapz(timeVector, Acceleration.Z);
+velocity_magnitude = sqrt(velocity_x.^2 + velocity_y.^2 + velocity_z.^2);
+distance_traveled = velocity_magnitude*0.019
+% Assuming Position.latitude and Position.longitude are arrays containing the latitude and longitude values.
+% Make sure that Position.latitude and Position.longitude are in radians.
+% If they are in degrees, convert them to radians by using deg2rad function.
+
+% time vector does not seem to be used in the calculation, so it will be omitted.
+% Initialize total distance
+total_distance = 0;
+earthCirc=40075
+% Loop through each point to calculate the distance to the next point
+for L = 1:435
+    % Caculate the angular distance in radians
+    % Calculate the distance for this segment
+    
+    
+    diff = distance(Position.latitude(L+1), Position.latitude(L), Position.longitude(L+1), Position.longitude(L));
+    distance_segment = (diff/360)*earthCirc;
+    
+    % Add the distance for this segment to the total distance
+    total_distance = total_distance + distance_segment;
+end
+
+% Output the total distance
+disp(['Total distance traveled: ', num2str(total_distance), ' meters']);
+load data
+head(Acceleration)
+timeDiffs = diff(Acceleration.Timestamp); % Calculate the difference between consecutive timestamps
+
+% Convert time differences to seconds. This step might vary depending on your timestamp format.
+timeDiffsInSeconds = seconds(timeDiffs);
+
+% Calculate the average sampling interval in seconds
+averageSamplingInterval = mean(timeDiffsInSeconds);
+
+% Calculate the sampling frequency in Hz
+fs = 1 / averageSamplingInterval;
+Y = fft(Acceleration.Z); % Assuming Z is your signal
+L = length(Acceleration.Z); % Signal length
+P2 = abs(Y/L); % Two-sided spectrum
+P1 = P2(1:L/2+1); % Single-sided spectrum
+P1(2:end-1) = 2*P1(2:end-1);
+f = fs*(0:(L/2))/L; % Frequency axis
+plot(f,P1); % Plot frequency spectrum
+title('Single-Sided Amplitude Spectrum of Z(t)');
+xlabel('f (Hz)');
+ylabel('|P1(f)|');
+hold on
+A = fft(Acceleration.X); % Assuming X is your signal
+B = length(Acceleration.X); % Signal length
+P2 = abs(A/B); % Two-sided spectrum
+P1 = P2(1:B/2+1); % Single-sided spectrum
+P1(2:end-1) = 2*P1(2:end-1);
+f = fs*(0:(L/2))/L; % Frequency axis
+plot(f,P1); % Plot frequency spectrum
+title('Single-Sided Amplitude Spectrum of Z(t)');
+xlabel('f (Hz)');
+ylabel('|P1(f)|');
+C = fft(Acceleration.Y); % Assuming X is your signal
+D = length(Acceleration.Y); % Signal length
+P2 = abs(C/D); % Two-sided spectrum
+P1 = P2(1:D/2+1); % Single-sided spectrum
+P1(2:end-1) = 2*P1(2:end-1);
+f = fs*(0:(L/2))/L; % Frequency axis
+plot(f,P1); % Plot frequency spectrum
+title('Single-Sided Amplitude Spectrum of Z(t)');
+xlabel('f (Hz)');
+ylabel('|P1(f)|');
+hold off
+%% 
+cutoffFrequency = 10; % Example cutoff frequency in Hz
+accelDataFiltered.X = lowpass(Acceleration.X, cutoffFrequency, fs);
+accelDataFiltered.Y = lowpass(Acceleration.Y, cutoffFrequency, fs);
+accelDataFiltered.Z = lowpass(Acceleration.Z, cutoffFrequency, fs);
+totalAccel = sqrt(accelDataFiltered.X.^2 + accelDataFiltered.Y.^2 + accelDataFiltered.Z.^2);
+%% 
+% Number of samples in your dataset
+numSamples = 22276;
+
+% Time step size in seconds
+timeStep = 0.019;
+
+% Create a time vector starting from 0, stepping by the timeStep, and ending just before numSamples*timeStep
+timeVector = (0:timeStep:(numSamples-1)*timeStep)';
+%% 
+FinalAccel = totalAccel- mean(totalAccel)
+minPeakHeight = std(FinalAccel);
+
+[pks,locs] = findpeaks(FinalAccel,'MINPEAKHEIGHT',minPeakHeight);
+numSteps = numel(pks)
+hold on;
+plot(timeVector(locs), pks, 'r', 'Marker', 'v', 'LineStyle', 'none');
+title('Counting Steps');
+xlabel('Time (s)');
+ylabel('Acceleration Magnitude, No Gravity (m/s^2)');
+hold off;
+% Initialize a column of zeros with the same length as your acceleration data
+stepIndicator = zeros(length(FinalAccel), 1);
+
+% Set the indices at the locations of the peaks to 1
+stepIndicator(locs) = 1;
+
+% The sum of this st
+% epIndicator vector will give you the total number of steps
+numSteps = sum(stepIndicator);
+
+% Calculate velocity by integratings acceleration
+velocity_x = cumtrapz(timeVector, Acceleration.X);
+velocity_y = cumtrapz(timeVector, Acceleration.Y);
+velocity_z = cumtrapz(timeVector, Acceleration.Z);
+velocity_magnitude = sqrt(velocity_x.^2 + velocity_y.^2 + velocity_z.^2);
+distance_traveled = velocity_magnitude*0.019
+averageSpeedKmH = mean(Position.speed)*3.6; % Assuming speedVector contains speeds at every 0.019 seconds
+if averageSpeedKmH < 3.2
+    MET = 2.0; % Slow walking
+elseif averageSpeedKmH >= 3.2 && averageSpeedKmH < 6.4
+    MET = 3.0; % Moderate walking
+elseif averageSpeedKmH >= 6.4 && averageSpeedKmH < 9.7
+    MET = 6.0; % Fast walking/jogging
+else
+    MET = 9.8; % Running
+end
+totalDurationHours = 750 / 3600; % Convert total time in seconds to hours
+weightKg = 73
+caloriesBurned = MET * weightKg * totalDurationHours;
+% Accelerometer data as X, Y, Z and outcomes as caloriesBurned, distance_traveled, numSteps
+load('Data.mat'); % Replace 'yourData.mat' with your actual data file
+
+% Normalize input features
+accelData = [Acceleration.X, Acceleration.Y, data.Acceleration.Z];
+accelDataNormalized = normalize(accelData, 'range');
+
+% Prepare outcomes
+outcomes = [Acceleration.caloriesBurned, Acceleration.distance_traveled, Acceleration.numSteps];
+
+% Split data into training and test sets
+cv = cvpartition(size(accelDataNormalized, 1), 'HoldOut', 0.2);
+idx = cv.test;
+XTrain = accelDataNormalized(~idx, :);
+YTrain = outcomes(~idx, :);
+XTest = accelDataNormalized(idx, :);
+YTest = outcomes(idx, :);
+
+% Reshape data for LSTM (samples, time steps, features)
+XTrain = reshape(XTrain', [1, size(XTrain, 2), size(XTrain, 1)]);
+XTest = reshape(XTest', [1, size(XTest, 2), size(XTest, 1)]);
+
+% Define LSTM network architecture
+layers = [
+    sequenceInputLayer(3)
+    lstmLayer(100, 'OutputMode', 'sequence')
+    fullyConnectedLayer(50)
+    dropoutLayer(0.5)
+    fullyConnectedLayer(size(YTrain, 2)) % Adjust this based on your outcomes
+    regressionLayer
+];
+
+% Training options
+options = trainingOptions('adam', ...
+    'MaxEpochs',100, ...
+    'MiniBatchSize', 128, ...
+    'InitialLearnRate', 0.01, ...
+    'Shuffle', 'every-epoch', ...
+    'ValidationData', {XTest, YTest}, ...
+    'Plots', 'training-progress');
+
+% Train the model
+net = trainNetwork(XTrain, YTrain, layers, options);
+
+% Predict and evaluate
+YPred = predict(net, XTest);
+performance = mean((YPred - YTest).^2); % Mean Squared Error
